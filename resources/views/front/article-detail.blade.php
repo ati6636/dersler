@@ -11,15 +11,18 @@
 
                         @php
                             $publishDate = \Illuminate\Support\Carbon::parse($article->publish_date)->format("d-m-Y");
+                            $tags = $article->getAttribute("tagsToArray");
                         @endphp
                         <time datetime="{{ $publishDate }}">{{ $publishDate }}</time>
-                        @foreach($article->getAttribute("tags") as $tag)
+                        @if(!is_null($tags) && count($tags))
+                            @foreach($article->getAttribute("tagsToArray") as $tag)
                             @php
                                 $class = ["text-danger", "text-warning", "text-primary", "text-success"];
                                 $randomClass = $class[random_int(0,3)];
                             @endphp
                             <span class="{{ $randomClass }}">{{ $tag }}</span>
                         @endforeach
+                        @endif
                     </div>
                     <div class="article-header-author">
                         Yazar: <a href="#"><strong>{{ $article->user->name }}</strong></a>

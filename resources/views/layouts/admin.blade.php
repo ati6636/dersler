@@ -21,6 +21,7 @@
     <link href="{{ asset('assets/admin/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/plugins/perfectscroll/perfect-scrollbar.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/plugins/pace/pace.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/sweetalert/sweetalert2.css') }}" rel="stylesheet">
 
 
     <!-- Theme Styles -->
@@ -69,6 +70,7 @@
 <script src="{{ asset('assets/admin/js/main.min.js') }}"></script>
 <script src="{{ asset('assets/admin/js/custom.js') }}"></script>
 <script src="{{ asset('assets/admin/js/pages/dashboard.js') }}"></script>
+<script src="{{ asset('vendor/sweetalert/sweetalert2.js') }}"></script>
 <script>
     $(document).ready(function () {
         $.ajaxSetup({
@@ -78,8 +80,6 @@
         });
     });
 </script>
-@include('sweetalert::alert')
-
 @yield("js")
 </body>
 </html>

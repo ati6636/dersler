@@ -4,7 +4,7 @@ hljs.highlightAll();
 $('#searchIcon2').click(function () {
     $("#searchForm").hide();
     $('#searchIcon1').show();
-})
+});
 $('#searchIcon1').click(function () {
     $(this).hide();
     $('#searchForm').show();

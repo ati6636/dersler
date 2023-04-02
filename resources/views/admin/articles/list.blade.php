@@ -189,6 +189,7 @@
     <script>
         $(document).ready(function () {
             $('.btnChangeStatus').click(function () {
+                alert();
                 let articleID = $(this).data('id');
                 let self = $(this);
                 Swal.fire({
