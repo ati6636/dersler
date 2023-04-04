@@ -21,6 +21,10 @@ use App\Http\Controllers\Admin\ArticleCommentController;
 
 Route::prefix("admin")->middleware("auth")->group(function()
 {
+    Route::get("/login", [LoginController::class, "showLogin"])->name("login");
+    Route::post("/login", [LoginController::class, "login"]);
+
+
     Route::group(['prefix' => 'filemanager'], function () {
         \UniSharp\LaravelFilemanager\Lfm::routes();
     });
@@ -82,12 +86,16 @@ Route::post("{article:id}/makale-yorum", [FrontController::class, "articleCommen
 
 
 
-Route::get("/login", [LoginController::class, "showLogin"])->name("login");
-Route::post("/login", [LoginController::class, "login"]);
 Route::post("/logout", [LoginController::class, "logout"])->name("logout");
 
 Route::get("/register", [LoginController::class, "showRegister"])->name("register");
 Route::post("/register", [LoginController::class, "register"]);
+
+Route::get('/auth/verify/{token}', [LoginController::class, 'verify'])->name('verify-token');
+
+Route::get('/verify_check', function (){
+    dd('dogrulandı');
+})->middleware('verified');
 
 
 

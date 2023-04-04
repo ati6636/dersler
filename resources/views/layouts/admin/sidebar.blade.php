@@ -25,7 +25,7 @@
                           Route::is("article.comment.list") ||
                           Route::is("article.pending-approval") ? "open" : "" }}">
                 <a href="#" class="">
-                    <i class="material-icons">tune</i>
+                    <i class="material-icons">article</i>
                     Makale Yönetimi
                     <i class="material-icons has-sub-menu">keyboard_arrow_right</i>
                 </a>
@@ -48,7 +48,7 @@
 
             <li class="{{ Route::is("category.index") || Route::is("category.create") ? "open" : "" }}">
                 <a href="#" class="">
-                    <i class="material-icons">tune</i>
+                    <i class="material-icons">category</i>
                     Kategori Yönetimi
                     <i class="material-icons has-sub-menu">keyboard_arrow_right</i>
                 </a>
@@ -62,12 +62,30 @@
                 </ul>
             </li>
 
+            <li class="{{ Route::is("user.index") || Route::is("user.create") ? "open" : "" }}">
+                <a href="#" class="">
+                    <i class="material-icons">person</i>
+                    Kullanıcı Yönetimi
+                    <i class="material-icons has-sub-menu">keyboard_arrow_right</i>
+                </a>
+                <ul class="sub-menu" style="">
+                    <li>
+                        <a href="{{ route("user.create") }}" class="{{ Route::is("ucers.create") ? "active" : "" }}">Kullanıcı Oluştur</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route("user.index") }}" class="{{ Route::is("user.index") ? "active" : "" }}">Kullanıcı Listesi</a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="{{ Route::is("settings") ? "open" : "" }}">
                 <a href="{{ route("settings") }}" >
                     <i class="material-icons-two-tone">settings</i>
                     Ayarlar
                 </a>
             </li>
+
         </ul>
     </div>
 </div>
