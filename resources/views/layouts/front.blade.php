@@ -12,7 +12,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+          rel="stylesheet">
 
     <link href="{{ asset("assets/front/material-icons/iconfont/material-icons.css") }}" rel="stylesheet">
 
@@ -34,27 +35,31 @@
     <div class="container">
         <div class="header-top d-flex justify-content-between align-items-center header-border header-h">
             <div class="header-logo">
-                <img src="{{ isset($settings) ? asset($settings->logo) : asset("assets/front/image/logo.png") }}" class="logo-h img-fluid">
+                <img src="{{ isset($settings) ? asset($settings->logo) : asset("assets/front/image/logo.png") }}"
+                     class="logo-h img-fluid">
             </div>
             <div class="header-text d-none d-md-block">
                 @isset($settings)
                     {!! $settings->header_text !!}
                 @endisset
-{{--                <p class="text-center text-secondary fst-italic">--}}
-{{--                    {{ $settings->header_text }}--}}
-{{--                </p>--}}
+                {{--                <p class="text-center text-secondary fst-italic">--}}
+                {{--                    {{ $settings->header_text }}--}}
+                {{--                </p>--}}
             </div>
             <div class="header-search align-items-center">
                 <span class="material-icons" id="searchIcon1">search</span>
                 <form action="" class="position-relative" style="display: none" id="searchForm">
                     <input type="text" name="search_text" id="search_text" placeholder="Search">
-                    <span class="material-icons position-absolute" id="searchIcon2" style="right: 0; top: 0; bottom: 0;">search</span>
+                    <span class="material-icons position-absolute" id="searchIcon2"
+                          style="right: 0; top: 0; bottom: 0;">search</span>
                 </form>
             </div>
         </div>
         <div class="header-bottom">
             <nav class="navbar navbar-expand-lg navbar-light ">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -67,13 +72,16 @@
                             <a class="nav-link" href="#">Link</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 Dropdown
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="#">Action</a></li>
                                 <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="#">Something else here</a></li>
                             </ul>
                         </li>
@@ -82,20 +90,41 @@
                         </li>
                     </ul>
 
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link d-flex me-2 text-orange" href="#">
-                                <span class="material-icons align-items-center me-1">app_registration</span>
-                                Kayıt
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex text-orange" href="#">
-                                <span class="material-icons align-items-center me-1">how_to_reg</span>
-                                Giriş
-                            </a>
-                        </li>
-                    </ul>
+                    @auth
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link d-flex me-2 text-orange" href="#">
+                                    <i class="fa fa-user d-flex align-items-center me-2"></i>
+                                    {{ auth()->user()->username }}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex text-orange" href="javascript:void(0)"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="fa fa-window-close d-flex align-items-center me-2"></i>
+                                    Çıkış Yap
+                                </a>
+                                <form action="{{ route('logout') }}" method="post" id="logout-form">
+                                    @csrf
+                                </form>
+                            </li>
+                        </ul>
+                    @else
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link d-flex me-2 text-orange" href="{{ route('register') }}">
+                                    <span class="material-icons align-items-center me-1">app_registration</span>
+                                    Kayıt
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex text-orange" href="{{ route('user.login') }}">
+                                    <span class="material-icons align-items-center me-1">how_to_reg</span>
+                                    Giriş
+                                </a>
+                            </li>
+                        </ul>
+                    @endauth
                 </div>
             </nav>
         </div>
@@ -107,7 +136,7 @@
     <main class="mt-5">
         <div class="row">
             <div class="col-md-9">
-               @yield("content")
+                @yield("content")
             </div>
             <div class="col-md-3">
                 <section class="categories bg-white shadow-sm">
@@ -138,7 +167,10 @@
                                 </div>
 
                                 <div class="swiper-slide">
-                                    <iframe width="100%" src="https://www.youtube.com/embed/pFTkk22CbAg" title="ONUNCU YIL MARŞI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                    <iframe width="100%" src="https://www.youtube.com/embed/pFTkk22CbAg"
+                                            title="ONUNCU YIL MARŞI" frameborder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowfullscreen></iframe>
                                 </div>
                             </div>
                         </div>

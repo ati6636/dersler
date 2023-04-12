@@ -17,6 +17,7 @@ class UserController extends Controller
             ->withTrashed()
             ->status($request->status)
             ->searchText($request->search_text)
+            ->isAdmin($request->is_admin)
             ->paginate(10);
 
         return view("admin.users.list", compact("list"));
@@ -41,9 +42,8 @@ class UserController extends Controller
 
     public function edit(Request $request, User $user)
     {
-//        dd($user);
-//        $user = User::findOrFail($request->id);
-        return view("admin.users.create-update", compact("user"));
+//        $user = User::findOrFail($request->user()->id);
+        return view("admin.users.create-update", compact('user'));
     }
 
     public function update(Request $request, User $user)
@@ -59,6 +59,7 @@ class UserController extends Controller
             unset($data['password']);
         }
         $data['status'] = isset($data['status']) ? 1 : 0;
+
         $user->update($data);
 
         alert()->success('Başarılı', "Kullanıcı güncellendi")->showConfirmButton('Tamam', '#3085d6')->autoClose(5000);
@@ -103,6 +104,28 @@ class UserController extends Controller
 
             return response()
                 ->json(['status' => "success", "message" => "Başarılı", "data" => $user, "user_status" => $user->status ])
+                ->setStatusCode(200);
+        }
+
+        return response()
+            ->json(['status' => "error", "message" => "User bulunamadı" ])
+            ->setStatusCode(404);
+    }
+
+    public function changeIsAdmin(Request $request): \Illuminate\Http\JsonResponse
+    {
+
+        $user = User::query()
+            ->where("id", $request->id)
+            ->first();
+
+        if ($user)
+        {
+            $user->is_admin = $user->is_admin ? 0 : 1;
+            $user->save();
+
+            return response()
+                ->json(['is_admin' => "success", "message" => "Başarılı", "data" => $user, "is_admin" => $user->is_admin ])
                 ->setStatusCode(200);
         }
 

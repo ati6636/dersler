@@ -11,12 +11,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
     public function showLogin()
     {
         return view("auth.login");
+    }
+    public function showloginUser()
+    {
+        return view("front.auth.login");
     }
 
     public function showRegister()
@@ -36,6 +41,10 @@ class LoginController extends Controller
 
         if ($user && \Hash::check($password, $user->password)) {
             Auth::login($user, $remember);
+
+            $userIsAdmin = Auth::user()->is_admin;
+            if (!$userIsAdmin)
+                return redirect()->route('home');
 //            Auth::loginUsingId($user->id);
             return redirect()->route("admin.index");
         } else {
@@ -92,13 +101,20 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        if (Auth::check()) {
+        if (Auth::check())
+        {
+            $isAdmin = Auth::user()->is_admin;
+
             Auth::logout();
 
             $request->session()->invalidate();
 
             $request->session()->regenerateToken();
 
+            if (!$isAdmin)
+            {
+                return redirect()->route('home');
+            }
             return redirect()->route("login");
         }
     }
@@ -138,6 +154,7 @@ class LoginController extends Controller
     {
         $verifyQuery = UserVerify::query()->where('token', $token);
         $find = $verifyQuery->first();
+
         if (!is_null($find))
         {
             $user = $find->user;
@@ -164,4 +181,42 @@ class LoginController extends Controller
             abort(404);
         }
     }
+
+    public function socialLogin ($driver)
+    {
+        return Socialite::driver($driver)->redirect();
+    }
+
+    public function socialVerify ($driver)
+    {
+        $user = Socialite::driver($driver)->user();
+
+        $userCheck = User::where('email', $user->getEmail())->first();
+
+        if ($userCheck)
+        {
+            Auth::login($userCheck);
+            return redirect()->route('home');
+        }
+        $username = Str::slug($user->getName());
+        $userCreate = User::create([
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'password' => bcrypt(''),
+            'username' => is_null($this->checkUsername($username)) ? $username : $username . uniqid(),
+            'status' => 1,
+            'email_verified_at' => now(),
+            $driver . '_id' => $user->getId()
+        ]);
+
+        Auth::login($userCreate);
+        return redirect()->route('home');
+
+    }
+
+    public function checkUsername(string $username): null|object
+    {
+        return User::query()->where('username', $username)->first();
+    }
+
 }

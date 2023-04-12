@@ -32,6 +32,7 @@ class User extends Authenticatable
         "github_id",
         "status",
         "email_verified_at",
+        'is_admin',
     ];
 
     /**
@@ -57,6 +58,12 @@ class User extends Authenticatable
     {
         if (!is_null($status))
             return $query->where("status", $status);
+    }
+
+    public function scopeIsAdmin($query, $isAdmin)
+    {
+        if (!is_null($isAdmin))
+            return $query->where("is_admin", $isAdmin);
     }
 
     public function scopeSearchText($query, $searchText)

@@ -41,6 +41,14 @@
                     </div>
 
                     <div class="col-3 my-2">
+                        <select class="form-select" name="is_admin" aria-label="isAdmin">
+                            <option value="{{ null }}">Role</option>
+                            <option value="0" {{ request()->get("is_admin") === "0" ? "selected" : "" }}>User</option>
+                            <option value="1" {{ request()->get("is_admin") === "1" ? "selected" : "" }}>Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="col-3 my-2">
                         <input type="text" class="form-control" placeholder="Name, Username, Email" name="search_text" value="{{ request()->get("search_text") }}">
                     </div>
                     <hr>
@@ -62,6 +70,7 @@
                     <th scope="col">Username</th>
                     <th scope="col">Email</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Is Admin</th>
                     <th scope="col">Actions</th>
                 </x-slot:columns>
 
@@ -85,8 +94,15 @@
                                 @endif
                             </td>
                             <td>
+                                @if($user->is_admin)
+                                    <a href="javascript:void(0)" class="btn btn-primary btn-sm btnChangeIsAdmin" data-id="{{ $user->id }}">Admin</a>
+                                @else
+                                    <a href="javascript:void(0)" class="btn btn-secondary btn-sm btnChangeIsAdmin" data-id="{{ $user->id }}">User</a>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="d-flex">
-                                    <a href="{{ route("user.edit", ['user' => $user->username]) }}"
+                                    <a href="{{ route("user.edit", $user->id) }}"
                                        class="btn btn-warning btn-sm">
                                         <i class="material-icons ms-0">edit</i>
                                     </a>
@@ -169,6 +185,66 @@
                                 Swal.fire({
                                     title: "Başarılı",
                                     text: "Status Güncellendi",
+                                    confirmButtonText: 'Tamam',
+                                    icon: "success"
+                                });
+                            },
+                            error: function (){
+                                console.log("hata geldi");
+                            }
+                        })
+                    }
+                    else if (result.isDenied)
+                    {
+                        Swal.fire({
+                            title: "Bilgi",
+                            text: "Herhangi bir işlem yapılmadı",
+                            confirmButtonText: 'Tamam',
+                            icon: "info"
+                        });
+                    }
+                })
+
+            });
+
+            $('.btnChangeIsAdmin').click(function () {
+                let id = $(this).data('id');
+                let self = $(this);
+                Swal.fire({
+                    title: 'Admin durumunu değiştirmek istediğinize emin misiniz?',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet',
+                    denyButtonText: `Hayır`,
+                    cancelButtonText: "İptal"
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed)
+                    {
+                        $.ajax({
+                            method: "POST",
+                            url: "{{ route('user.changeIsAdmin') }}",
+                            data: {
+                                id : id
+                            },
+                            async:false,
+                            success: function (data) {
+                                if(data.is_admin)
+                                {
+                                    self.removeClass("btn-secondary");
+                                    self.addClass("btn-primary");
+                                    self.text("Admin");
+                                }
+                                else
+                                {
+                                    self.removeClass("btn-primary");
+                                    self.addClass("btn-secondary");
+                                    self.text("User");
+                                }
+
+                                Swal.fire({
+                                    title: "Başarılı",
+                                    text: "Is Admin Güncellendi",
                                     confirmButtonText: 'Tamam',
                                     icon: "success"
                                 });
