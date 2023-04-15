@@ -16,12 +16,12 @@
                         <time datetime="{{ $publishDate }}">{{ $publishDate }}</time>
                         @if(!is_null($tags) && count($tags))
                             @foreach($article->getAttribute("tagsToArray") as $tag)
-                            @php
-                                $class = ["text-danger", "text-warning", "text-primary", "text-success"];
-                                $randomClass = $class[random_int(0,3)];
-                            @endphp
-                            <span class="{{ $randomClass }}">{{ $tag }}</span>
-                        @endforeach
+                                @php
+                                    $class = ["text-danger", "text-warning", "text-primary", "text-success"];
+                                    $randomClass = $class[random_int(0,3)];
+                                @endphp
+                                <span class="{{ $randomClass }}">{{ $tag }}</span>
+                            @endforeach
                         @endif
                     </div>
                     <div class="article-header-author">
@@ -53,7 +53,7 @@
                        data-id="{{ $article->id }}"
                        @if(!is_null($userLike))
                            style="color:red"
-                       @endif
+                            @endif
                     >
                         <span class="material-icons-outlined">favorite</span>
                     </a>
@@ -72,6 +72,60 @@
                     </div>
                 </div>
             </div>
+
+            @if(isset($suggestArticles) && count($suggestArticles))
+                <div class="mt-5">
+                    <div class="swiper-most-popular mt-3">
+                        <div class="swiper-wrapper">
+                            @foreach($suggestArticles as $article)
+                                <div class="swiper-slide">
+                                    @php
+                                        $image = $article->image;
+                                        $publishDate = \Carbon\Carbon::parse($article->publish_date)->format('d-m-Y');
+                                            if (!file_exists(public_path($image)))
+                                                {
+                                                    $image = $settings->article_default_image;
+                                                }
+                                    @endphp
+                                    <a href="{{ route('front.articleDetail',
+                                    ['user' => $article->user, 'article' => $article->slug]) }}">
+                                        <img src="{{ asset($image) }}" class="img-fluid">
+                                    </a>
+
+                                    <div class="most-popular-body mt-2">
+                                        <div class="most-popular-author d-flex justify-content-between">
+                                            <div>
+                                                Yazar:
+                                                <a href="{{ route('front.category',['category' => $article->category->slug]) }}">
+                                                    {{ $article->user->name }}
+                                                </a>
+                                            </div>
+                                            <div class="text-end">Kategori:
+                                                <a href="{{ route('front.category',['category' => $article->category->slug]) }}">
+                                                    {{ $article->category->name }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="most-popular-title">
+                                            <h4 class="text-black">
+                                                <a href="#">
+                                                    {{ $article->title }}
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div class="most-popular-date">
+                                            <span>{{ $publishDate }}</span> &#x25CF; <span>10 dk</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            @endforeach
+
+                        </div>
+                    </div>
+                </div>
+
+            @endif
 
         </section>
 
@@ -93,7 +147,8 @@
                             <input type="email" class="form-control" placeholder="Email Adresi" name="email" required>
                         </div>
                         <div class="col-12 mt-3">
-                            <textarea name="comment" id="comment" cols="30" rows="5" class="form-control" placeholder="Mesajınız"></textarea>
+                            <textarea name="comment" id="comment" cols="30" rows="5" class="form-control"
+                                      placeholder="Mesajınız"></textarea>
                         </div>
                         <div class="col-md-4">
                             <button class="btn-response align-items-center d-flex mt-3">
@@ -145,7 +200,8 @@
                                     <p class="text-secondary">{{ $comment->comment }}</p>
                                     <div class="d-flex  align-items-center justify-content-between">
                                         <div>
-                                            <a href="javascript:void(0)" class="btn-response btnArticleResponseComment" data-id="{{ $comment->id }}">Cevap Ver</a>
+                                            <a href="javascript:void(0)" class="btn-response btnArticleResponseComment"
+                                               data-id="{{ $comment->id }}">Cevap Ver</a>
                                         </div>
                                         <div class="d-flex  align-items-center">
                                             @php
@@ -156,7 +212,7 @@
                                                data-id="{{ $comment->id }}"
                                                @if(!is_null($commentLike))
                                                    style="color:red"
-                                               @endif
+                                                    @endif
                                             >
                                                 <span class="material-icons">thumb_up</span>
                                             </a>
@@ -168,62 +224,62 @@
                         </div>
 
                         @if($comment->children)
-                                <div class="articles-response-comment-wrapper">
-                                    @foreach($comment->children as $child)
-                                        @php
-                                            if ($child->user)
-                                            {
-                                                $childImage = $child->user->image;
+                            <div class="articles-response-comment-wrapper">
+                                @foreach($comment->children as $child)
+                                    @php
+                                        if ($child->user)
+                                        {
+                                            $childImage = $child->user->image;
 
-                                                $childName = $child->user->name;
+                                            $childName = $child->user->name;
 
-                                                if (!file_exists(public_path($childImage)))
-                                                {
-                                                    $childImage = $settings->default_comment_profile_image;
-                                                }
-                                            }
-                                            else
+                                            if (!file_exists(public_path($childImage)))
                                             {
                                                 $childImage = $settings->default_comment_profile_image;
-                                                $childName = $child->name;
                                             }
-                                        @endphp
+                                        }
+                                        else
+                                        {
+                                            $childImage = $settings->default_comment_profile_image;
+                                            $childName = $child->name;
+                                        }
+                                    @endphp
 
-                                        <div class="article-comment bg-white p-2 mt-3 d-flex justify-content-between align-items-center shadow-sm">
-                                            <div class="col-md-2">
-                                                <img src="{{ asset($childImage) }}" alt="" width="75" height="75">
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="px-3">
-                                                    <div class="comment-title-date d-flex justify-content-between">
-                                                        <h4 class="mt-3"><a href="">{{ $childName }}</a></h4>
-                                                        <time datetime="{{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}">
-                                                            {{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}
-                                                        </time>
-                                                    </div>
-                                                    <p class="text-secondary">{{ $child->comment }}</p>
-                                                    <div class="d-flex  align-items-center justify-content-between">
-                                                        <div class="d-flex  align-items-center">
-                                                            @php
-                                                                $commentLikeChild = $child->commentLikes->where('user_id', auth()->id())->where("comment_id", $child->id)->first();
-                                                            @endphp
-                                                            <a href="javascript:void(0)"
-                                                               class="like-comment"
-                                                               data-id="{{ $child->id }}"
-                                                               @if(!is_null($commentLikeChild))
-                                                                   style="color:red"
-                                                               @endif
-                                                            >
-                                                                <span class="material-icons">thumb_up</span>
-                                                            </a>
-                                                            <span id="commentLikeCount-{{ $child->id }}">{{ $child->like_count }}</span>
-                                                        </div>
+                                    <div class="article-comment bg-white p-2 mt-3 d-flex justify-content-between align-items-center shadow-sm">
+                                        <div class="col-md-2">
+                                            <img src="{{ asset($childImage) }}" alt="" width="75" height="75">
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="px-3">
+                                                <div class="comment-title-date d-flex justify-content-between">
+                                                    <h4 class="mt-3"><a href="">{{ $childName }}</a></h4>
+                                                    <time datetime="{{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}">
+                                                        {{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}
+                                                    </time>
+                                                </div>
+                                                <p class="text-secondary">{{ $child->comment }}</p>
+                                                <div class="d-flex  align-items-center justify-content-between">
+                                                    <div class="d-flex  align-items-center">
+                                                        @php
+                                                            $commentLikeChild = $child->commentLikes->where('user_id', auth()->id())->where("comment_id", $child->id)->first();
+                                                        @endphp
+                                                        <a href="javascript:void(0)"
+                                                           class="like-comment"
+                                                           data-id="{{ $child->id }}"
+                                                           @if(!is_null($commentLikeChild))
+                                                               style="color:red"
+                                                                @endif
+                                                        >
+                                                            <span class="material-icons">thumb_up</span>
+                                                        </a>
+                                                        <span id="commentLikeCount-{{ $child->id }}">{{ $child->like_count }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         @endif
 
 
@@ -238,8 +294,7 @@
 @section("js")
     <script>
         $(document).ready(function () {
-            $('#favoriteArticle').click(function ()
-            {
+            $('#favoriteArticle').click(function () {
                 @if(Auth::check())
                 let articleID = $(this).data('id');
                 console.log(articleID);
@@ -248,21 +303,18 @@
                     method: "POST",
                     url: "{{ route('article.favorite') }}",
                     data: {
-                        id : articleID
+                        id: articleID
                     },
-                    async:false,
+                    async: false,
                     success: function (data) {
-                        if(data.process)
-                        {
+                        if (data.process) {
                             self.css("color", "red")
-                        }
-                        else
-                        {
+                        } else {
                             self.css("color", "inherit")
                         }
                         $("#favoriteCount").text(data.like_count);
                     },
-                    error: function (){
+                    error: function () {
                         console.log("hata geldi");
                     }
                 })
@@ -278,40 +330,36 @@
 
             });
 
-            $('.like-comment').click(function ()
-            {
+            $('.like-comment').click(function () {
                 @if(Auth::check())
-                    let articleID = $(this).data('id');
-                    let self = $(this);
-                    $.ajax({
+                let articleID = $(this).data('id');
+                let self = $(this);
+                $.ajax({
                     method: "POST",
                     url: "{{ route('article.comment.favorite') }}",
                     data: {
-                        id : articleID
+                        id: articleID
                     },
-                    async:false,
+                    async: false,
                     success: function (data) {
-                        if(data.process)
-                        {
+                        if (data.process) {
                             self.css("color", "red")
-                        }
-                        else
-                        {
+                        } else {
                             self.css("color", "inherit")
                         }
                         $("#commentLikeCount-" + articleID).text(data.like_count);
                     },
-                    error: function (){
+                    error: function () {
                         console.log("hata geldi");
                     }
                 })
                 @else
-                    Swal.fire({
-                        title: "Bilgi",
-                        text: "Kullanıcı girişi yapmadan yorumu beğenemezsiniz.",
-                        confirmButtonText: 'Tamam',
-                        icon: "info"
-                    });
+                Swal.fire({
+                    title: "Bilgi",
+                    text: "Kullanıcı girişi yapmadan yorumu beğenemezsiniz.",
+                    confirmButtonText: 'Tamam',
+                    icon: "info"
+                });
                 @endif
 
 

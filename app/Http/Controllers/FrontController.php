@@ -4,12 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\ArticleComment;
-use App\Models\Category;
-use App\Models\Settings;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 
 class FrontController extends Controller
 {
@@ -40,39 +36,31 @@ class FrontController extends Controller
 
         $articles = Article::query()
             ->with(['category:id,name', "user:id,name,username"])
-            ->whereHas("category", function($query) use ($slug){
+            ->whereHas("category", function ($query) use ($slug) {
                 $query->where("slug", $slug);
             })->paginate(3);
 
 
-
-        return view("front.article-list", compact( "articles"));
+        return view("front.article-list", compact("articles"));
 
     }
 
     public function articleDetail(Request $request, string $username, string $articleSlug)
     {
-//        $settings = Settings::first();
-//        $categories = Category::query()->where("status", 1)->get();
+        $article = session()->get('last_article');
+        $visitedArticles = session()->get('visited_articles');
 
-        $article = Article::query()->with([
-//            "user",
-            "user.articleLike",
-            "comments" => function($query)
-            {
-                $query->where("status", 1)
-                      ->whereNull("parent_id");
-            },
-            "comments.commentLikes",
-            "comments.user",
-            "comments.children" => function($query){
-                $query->where("status", 1);
-            },
-            "comments.children.user",
-            "comments.children.commentLikes"
-        ])
-            ->where("slug", $articleSlug)
-            ->first();
+
+        $visitedArticlesCategoryIds = Article::query()
+            ->whereIn('id', $visitedArticles)
+            ->pluck('category_id');
+
+        $suggestArticles = Article::query()
+            ->with('user', 'category')
+            ->whereIn('category_id', $visitedArticlesCategoryIds)
+            ->whereNotIn('id', $visitedArticles)
+            ->limit(6)
+            ->get();
 
         $userLike = $article
             ->articleLikes
@@ -84,14 +72,13 @@ class FrontController extends Controller
         $article->increment("view_count");
         $article->save();
 
-        return view("front.article-detail", compact("article", "userLike"));
+        return view("front.article-detail", compact("article", "userLike", "suggestArticles"));
     }
 
     public function articleComment(Request $request, Article $article)
     {
         $data = $request->except("_token");
-        if (Auth::check())
-        {
+        if (Auth::check()) {
             $data['user_id'] = Auth::id();
         }
         $data['article_id'] = $article->id;

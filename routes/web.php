@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FrontController;
+use App\Http\Middleware\VisitedArticleMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,7 +82,9 @@ Route::prefix("admin")->middleware(["auth", 'verified'])->group(function () {
 
 Route::get('/', [FrontController::class, "home"])->name("home");
 Route::get("/kategoriler/{category:slug}", [FrontController::class, "category"])->name("front.category");
-Route::get("/@{user:username}/{article:slug}", [FrontController::class, "articleDetail"])->name("front.articleDetail");
+Route::get("/@{user:username?}/{article:slug}", [FrontController::class, "articleDetail"])
+    ->name("front.articleDetail")
+    ->middleware(VisitedArticleMiddleware::class);
 Route::post("{article:id}/makale-yorum", [FrontController::class, "articleComment"])->name("article.comment");
 
 
