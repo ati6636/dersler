@@ -15,7 +15,7 @@
                         @endphp
                         <time datetime="{{ $publishDate }}">{{ $publishDate }}</time>
                         @if(!is_null($tags) && count($tags))
-                            @foreach($article->getAttribute("tagsToArray") as $tag)
+                            @foreach($tags as $tag)
                                 @php
                                     $class = ["text-danger", "text-warning", "text-primary", "text-success"];
                                     $randomClass = $class[random_int(0,3)];
@@ -37,7 +37,14 @@
                         {{ $article->title }}
                     </h1>
                     <div class="d-flex justify-content-center">
-                        <img src="{{ asset($article->image) }}" class="img-fluid w-75 rounded-1">
+                        @php
+                            $articleImage = $article->image;
+                                if (!file_exists(public_path($articleImage)) || is_null($articleImage))
+                                    {
+                                        $articleImage = $settings->article_default_image;
+                                    }
+                        @endphp
+                        <img src="{{ asset($articleImage) }}" class="img-fluid w-75 rounded-1">
                     </div>
                     <div class="text-secondary mt-5">
                         {!! $article->body !!}
@@ -68,7 +75,15 @@
 
             <div class="article-authors mt-5">
                 <div class="bg-white p-4 d-flex justify-content-between align-items-center shadow-sm">
-                    <img src="{{ asset($article->user->image) }}" alt="" width="75" height="75">
+                    @php
+                        $authorImage = $article->user->image;
+                            if (!file_exists(public_path($authorImage)) || is_null($authorImage))
+                                {
+                                    $authorImage = $settings->default_comment_profile_image;
+                                }
+                    @endphp
+
+                    <img src="{{ asset($authorImage) }}" alt="" width="75" height="75">
                     <div class="px-5 me-auto">
                         <h4 class="mt-3"><a href="">{{ $article->user->name }}</a></h4>
                         {!! $article->user->about !!}

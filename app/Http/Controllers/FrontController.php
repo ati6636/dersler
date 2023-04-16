@@ -130,4 +130,11 @@ class FrontController extends Controller
         return view("front.article-list", compact("articles", "title"));
 
     }
+
+    public function articleList()
+    {
+        $articles = Article::query()->orderBy('publish_date', 'DESC')->paginate(21);
+
+        return view("front.article-list", compact("articles"));
+    }
 }

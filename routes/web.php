@@ -79,27 +79,27 @@ Route::prefix("admin")->middleware(["auth", 'verified'])->group(function () {
 
 });
 
+Route::get("admin/login", [LoginController::class, "showLogin"])->name("login");
+Route::post("admin/login", [LoginController::class, "login"]);
+
+Route::get("/login", [LoginController::class, "showloginUser"])->name("user.login");
+Route::post("/login", [LoginController::class, "loginUser"]);
+
+Route::post("/logout", [LoginController::class, "logout"])->name("logout");
+Route::get("/register", [LoginController::class, "showRegister"])->name("register");
+Route::post("/register", [LoginController::class, "register"]);
+
 
 Route::get('/', [FrontController::class, "home"])->name("home");
+Route::get('makaleler', [FrontController::class, "articleList"])->name("front.articleList");
 Route::get("/kategoriler/{category:slug}", [FrontController::class, "categoryArticles"])->name("front.categoryArticles");
 Route::get("/yazarlar/{user:username?}", [FrontController::class, "authorArticles"])->name("front.authorArticles");
-Route::get("/@{user:username?}/{article:slug}", [FrontController::class, "articleDetail"])
+Route::get("/{user:username?}/{article:slug}", [FrontController::class, "articleDetail"])
     ->name("front.articleDetail")
     ->middleware(VisitedArticleMiddleware::class);
 Route::post("/{article:id}/makale-yorum", [FrontController::class, "articleComment"])->name("article.comment");
 Route::get("/arama", [FrontController::class, "search"])->name("front.search");
 
-
-Route::get("admin/login", [LoginController::class, "showLogin"])->name("login");
-Route::post("admin/login", [LoginController::class, "login"]);
-
-Route::post("/logout", [LoginController::class, "logout"])->name("logout");
-
-Route::get("/login", [LoginController::class, "showloginUser"])->name("user.login");
-Route::post("/login", [LoginController::class, "loginUser"]);
-
-Route::get("/register", [LoginController::class, "showRegister"])->name("register");
-Route::post("/register", [LoginController::class, "register"]);
 
 Route::get('/auth/verify/{token}', [LoginController::class, 'verify'])->name('verify-token');
 Route::get('/auth/{driver}', [LoginController::class, 'socialLogin'])->name('socialLogin');
