@@ -81,11 +81,13 @@ Route::prefix("admin")->middleware(["auth", 'verified'])->group(function () {
 
 
 Route::get('/', [FrontController::class, "home"])->name("home");
-Route::get("/kategoriler/{category:slug}", [FrontController::class, "category"])->name("front.category");
+Route::get("/kategoriler/{category:slug}", [FrontController::class, "categoryArticles"])->name("front.categoryArticles");
+Route::get("/yazarlar/{user:username?}", [FrontController::class, "authorArticles"])->name("front.authorArticles");
 Route::get("/@{user:username?}/{article:slug}", [FrontController::class, "articleDetail"])
     ->name("front.articleDetail")
     ->middleware(VisitedArticleMiddleware::class);
-Route::post("{article:id}/makale-yorum", [FrontController::class, "articleComment"])->name("article.comment");
+Route::post("/{article:id}/makale-yorum", [FrontController::class, "articleComment"])->name("article.comment");
+Route::get("/arama", [FrontController::class, "search"])->name("front.search");
 
 
 Route::get("admin/login", [LoginController::class, "showLogin"])->name("login");

@@ -20,12 +20,15 @@
                                     $class = ["text-danger", "text-warning", "text-primary", "text-success"];
                                     $randomClass = $class[random_int(0,3)];
                                 @endphp
-                                <span class="{{ $randomClass }}">{{ $tag }}</span>
+                                <a href="{{ route('front.search', ['q' => $tag]) }}" >
+                                    <span class="{{ $randomClass }}">{{ $tag }}</span>
+                                </a>
                             @endforeach
                         @endif
                     </div>
                     <div class="article-header-author">
-                        Yazar: <a href="#"><strong>{{ $article->user->name }}</strong></a>
+                        Yazar: <a href="#" class="category-link"><strong>{{ $article->user->name }}</strong></a><br>
+                        Kategori: <a href="#" class="category-link"><strong>{{ $article->category->name }}</strong></a>
                     </div>
 
                 </div>
@@ -75,14 +78,14 @@
 
             @if(isset($suggestArticles) && count($suggestArticles))
                 <div class="mt-5">
-                    <div class="swiper-most-popular mt-3">
+                    <div class="swiper-suggest-article mt-3">
                         <div class="swiper-wrapper">
                             @foreach($suggestArticles as $article)
                                 <div class="swiper-slide">
                                     @php
                                         $image = $article->image;
                                         $publishDate = \Carbon\Carbon::parse($article->publish_date)->format('d-m-Y');
-                                            if (!file_exists(public_path($image)))
+                                            if (!file_exists(public_path($image)) || is_null($image))
                                                 {
                                                     $image = $settings->article_default_image;
                                                 }
@@ -96,12 +99,12 @@
                                         <div class="most-popular-author d-flex justify-content-between">
                                             <div>
                                                 Yazar:
-                                                <a href="{{ route('front.category',['category' => $article->category->slug]) }}">
+                                                <a href="{{ route('front.categoryArticles',['category' => $article->category->slug]) }}">
                                                     {{ $article->user->name }}
                                                 </a>
                                             </div>
                                             <div class="text-end">Kategori:
-                                                <a href="{{ route('front.category',['category' => $article->category->slug]) }}">
+                                                <a href="{{ route('front.categoryArticles',['category' => $article->category->slug]) }}">
                                                     {{ $article->category->name }}
                                                 </a>
                                             </div>
