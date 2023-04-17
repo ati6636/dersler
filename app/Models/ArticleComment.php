@@ -14,6 +14,12 @@ class ArticleComment extends Model
 
     protected $guarded = [];
 
+    public function getFormatPublishDateAttribute($format = 'd-m-Y H:i'):string
+    {
+        return \Carbon\Carbon::parse($this->attributes['publish_date'])->format($format);
+    }
+
+
     public function scopeApproveStatus($query)
     {
         return $query->where("status", 0);

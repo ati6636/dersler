@@ -10,10 +10,11 @@
                     <div class="article-header-date">
 
                         @php
-                            $publishDate = \Illuminate\Support\Carbon::parse($article->publish_date)->format("d-m-Y");
                             $tags = $article->getAttribute("tagsToArray");
                         @endphp
-                        <time datetime="{{ $publishDate }}">{{ $publishDate }}</time>
+                        <time datetime="{{ $article->getFormatPublishDateAttribute() }}">
+                            {{ $article->getFormatPublishDateAttribute() }}
+                        </time>
                         @if(!is_null($tags) && count($tags))
                             @foreach($tags as $tag)
                                 @php
@@ -37,14 +38,8 @@
                         {{ $article->title }}
                     </h1>
                     <div class="d-flex justify-content-center">
-                        @php
-                            $articleImage = $article->image;
-                                if (!file_exists(public_path($articleImage)) || is_null($articleImage))
-                                    {
-                                        $articleImage = $settings->article_default_image;
-                                    }
-                        @endphp
-                        <img src="{{ asset($articleImage) }}" class="img-fluid w-75 rounded-1">
+
+                        <img src="{{ imageExist($article->image, $settings->article_default_image) }}" class="img-fluid w-75 rounded-1">
                     </div>
                     <div class="text-secondary mt-5">
                         {!! $article->body !!}
@@ -75,15 +70,8 @@
 
             <div class="article-authors mt-5">
                 <div class="bg-white p-4 d-flex justify-content-between align-items-center shadow-sm">
-                    @php
-                        $authorImage = $article->user->image;
-                            if (!file_exists(public_path($authorImage)) || is_null($authorImage))
-                                {
-                                    $authorImage = $settings->default_comment_profile_image;
-                                }
-                    @endphp
 
-                    <img src="{{ asset($authorImage) }}" alt="" width="75" height="75">
+                    <img src="{{ imageExist($article->user->image, $settings->article_default_image) }}" alt="" width="75" height="75">
                     <div class="px-5 me-auto">
                         <h4 class="mt-3"><a href="">{{ $article->user->name }}</a></h4>
                         {!! $article->user->about !!}
@@ -97,17 +85,10 @@
                         <div class="swiper-wrapper">
                             @foreach($suggestArticles as $article)
                                 <div class="swiper-slide">
-                                    @php
-                                        $image = $article->image;
-                                        $publishDate = \Carbon\Carbon::parse($article->publish_date)->format('d-m-Y');
-                                            if (!file_exists(public_path($image)) || is_null($image))
-                                                {
-                                                    $image = $settings->article_default_image;
-                                                }
-                                    @endphp
+
                                     <a href="{{ route('front.articleDetail',
                                     ['user' => $article->user, 'article' => $article->slug]) }}">
-                                        <img src="{{ asset($image) }}" class="img-fluid">
+                                        <img src="{{ imageExist($article->image, $settings->article_default_image) }}" class="img-fluid">
                                     </a>
 
                                     <div class="most-popular-body mt-2">
@@ -132,7 +113,7 @@
                                             </h4>
                                         </div>
                                         <div class="most-popular-date">
-                                            <span>{{ $publishDate }}</span> &#x25CF; <span>10 dk</span>
+                                            <span>{{ $article->getFormatPublishDateAttribute() }}</span> &#x25CF; <span>10 dk</span>
                                         </div>
                                     </div>
                                 </div>
@@ -189,30 +170,22 @@
                                 @php
                                     if ($comment->user)
                                     {
-                                        $image = $comment->user->image;
-
                                         $name = $comment->user->name;
-
-                                        if (!file_exists(public_path($image)))
-                                        {
-                                            $image = $settings->default_comment_profile_image;
-                                        }
                                     }
                                     else
                                     {
-                                        $image = $settings->default_comment_profile_image;
                                         $name = $comment->name;
                                     }
                                 @endphp
 
-                                <img src="{{ asset($image) }}" alt="" width="75" height="75">
+                                <img src="{{ imageExist($comment->user->image,$settings->default_comment_profile_image) }}" alt="" width="75" height="75">
                             </div>
                             <div class="col-md-10">
                                 <div class="px-3">
                                     <div class="comment-title-date d-flex justify-content-between">
                                         <h4 class="mt-3"><a href="">{{ $name }}</a></h4>
-                                        <time datetime="{{ \Carbon\Carbon::parse($comment->created_at)->format("d-m-Y") }}">
-                                            {{ \Carbon\Carbon::parse($comment->created_at)->format("d-m-Y") }}
+                                        <time datetime="{{ $comment->getFormatPublishDateAttribute() }}">
+                                            {{ $comment->getFormatPublishDateAttribute() }}
                                         </time>
                                     </div>
                                     <p class="text-secondary">{{ $comment->comment }}</p>
@@ -247,32 +220,24 @@
                                     @php
                                         if ($child->user)
                                         {
-                                            $childImage = $child->user->image;
-
                                             $childName = $child->user->name;
-
-                                            if (!file_exists(public_path($childImage)))
-                                            {
-                                                $childImage = $settings->default_comment_profile_image;
-                                            }
                                         }
                                         else
                                         {
-                                            $childImage = $settings->default_comment_profile_image;
                                             $childName = $child->name;
                                         }
                                     @endphp
 
                                     <div class="article-comment bg-white p-2 mt-3 d-flex justify-content-between align-items-center shadow-sm">
                                         <div class="col-md-2">
-                                            <img src="{{ asset($childImage) }}" alt="" width="75" height="75">
+                                            <img src="{{ imageExist($child->user->image, $settings->default_comment_profile_image) }}" alt="" width="75" height="75">
                                         </div>
                                         <div class="col-md-10">
                                             <div class="px-3">
                                                 <div class="comment-title-date d-flex justify-content-between">
                                                     <h4 class="mt-3"><a href="">{{ $childName }}</a></h4>
-                                                    <time datetime="{{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}">
-                                                        {{ \Carbon\Carbon::parse($child->created_at)->format("d-m-Y") }}
+                                                    <time datetime="{{ $child->getFormatPublishDateAttribute() }}">
+                                                        {{ $child->getFormatPublishDateAttribute() }}
                                                     </time>
                                                 </div>
                                                 <p class="text-secondary">{{ $child->comment }}</p>
