@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FrontController;
 use App\Http\Middleware\VisitedArticleMiddleware;
 use Illuminate\Support\Facades\Route;
+use UniSharp\LaravelFilemanager\Lfm;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +26,10 @@ Route::prefix("admin")->middleware(["auth", 'verified'])->group(function () {
     Route::middleware('isAdmin')->group(function () {
 
         Route::group(['prefix' => 'filemanager'], function () {
-            \UniSharp\LaravelFilemanager\Lfm::routes();
+            Lfm::routes();
         });
+        Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+        Route::get('logs2', [\Arcanedev\LogViewer\Http\Controllers\LogViewerController::class, 'index']);
 
         Route::get('/', function () {
             return view('admin.index');

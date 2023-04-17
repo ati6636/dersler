@@ -119,7 +119,7 @@
                                                     'user' => $article->user->username,
                                                     'article' => $article->slug
                                                     ]) }}">
-                                <img src="{{ imageExist($article->image, $settings->article_default_image)) }}" class="img-fluid">
+                                <img src="{{ imageExist($article->image, $settings->article_default_image) }}" class="img-fluid">
                             </a>
 
                             <div class="most-popular-body mt-2">
